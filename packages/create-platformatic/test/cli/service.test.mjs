@@ -1,4 +1,5 @@
-import { test, beforeEach, afterEach } from 'tap'
+import { test, before, after } from 'node:test'
+import assert from 'node:assert'
 import { executeCreatePlatformatic, keys, walk } from './helper.mjs'
 import { isFileAccessible, safeMkdir } from '../../src/utils.mjs'
 import { join } from 'node:path'
@@ -6,11 +7,11 @@ import { tmpdir } from 'os'
 import { readFile, mkdtemp, rm, writeFile } from 'node:fs/promises'
 
 let tmpDir
-beforeEach(async () => {
+before(async () => {
   tmpDir = await mkdtemp(join(tmpdir(), 'test-create-platformatic-'))
 })
 
-afterEach(async () => {
+after(async () => {
   try {
     await rm(tmpDir, { recursive: true, force: true })
   } catch (e) {
@@ -18,7 +19,7 @@ afterEach(async () => {
   }
 })
 
-test('Creates a Platformatic Service with no typescript', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic Service with no typescript', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -52,17 +53,17 @@ test('Creates a Platformatic Service with no typescript', async ({ equal, same, 
   const baseProjectDir = join(tmpDir, 'platformatic-service')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.service.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.js')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, 'platformatic.service.json')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.js')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.js')), true)
+  assert.equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
 })
 
-test('Creates a Platformatic Service with typescript', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic Service with typescript', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -96,20 +97,20 @@ test('Creates a Platformatic Service with typescript', async ({ equal, same, mat
   const baseProjectDir = join(tmpDir, 'platformatic-service')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.service.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'global.d.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.service.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'global.d.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
 })
 
-test('Creates a Platformatic Service in a non empty directory', async ({ equal, not, teardown }) => {
+test('Creates a Platformatic Service in a non empty directory', async () => {
   const targetDirectory = join(tmpdir(), 'platformatic-service-test')
   // const targetDirectory = '/tmp/tst'
   async function generateServiceFileStructure (dir) {
@@ -124,10 +125,6 @@ test('Creates a Platformatic Service in a non empty directory', async ({ equal, 
   }
   // generate a sample file structure
   await generateServiceFileStructure(targetDirectory)
-
-  teardown(async () => {
-    await rm(targetDirectory, { recursive: true })
-  })
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -161,17 +158,19 @@ test('Creates a Platformatic Service in a non empty directory', async ({ equal, 
   }]
   await executeCreatePlatformatic(tmpDir, actions, 'All done!')
 
-  equal(await isFileAccessible(join(targetDirectory, '.gitignore')), true)
-  equal(await isFileAccessible(join(targetDirectory, '.env')), true)
-  equal(await isFileAccessible(join(targetDirectory, '.env.sample')), true)
-  equal(await isFileAccessible(join(targetDirectory, 'platformatic.service.json')), true)
-  equal(await isFileAccessible(join(targetDirectory, 'README.md')), true)
-  equal(await isFileAccessible(join(targetDirectory, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(targetDirectory, 'routes', 'sample.js')), true)
-  equal(await isFileAccessible(join(targetDirectory, 'plugins', 'example.js')), true)
-  equal(await isFileAccessible(join(targetDirectory, '.git', 'config')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, 'platformatic.service.json')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, 'routes', 'sample.js')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(targetDirectory, '.git', 'config')), true)
 
   // check file contents
-  not(await readFile(join(targetDirectory, 'routes', 'root.js'), 'utf8'), 'console.log(\'hello world\')')
-  equal(await readFile(join(targetDirectory, 'routes', 'sample.js'), 'utf8'), 'console.log(\'hello world\')')
+  assert.notStrictEqual(await readFile(join(targetDirectory, 'routes', 'root.js'), 'utf8'), 'console.log(\'hello world\')')
+  assert.strictEqual(await readFile(join(targetDirectory, 'routes', 'sample.js'), 'utf8'), 'console.log(\'hello world\')')
+
+  await rm(targetDirectory, { recursive: true })
 })

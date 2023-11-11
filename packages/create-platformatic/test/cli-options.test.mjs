@@ -1,10 +1,11 @@
 'use strict'
 
-import { test } from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert'
 import { getRunPackageManagerInstall, getUseTypescript, getPort } from '../src/cli-options.mjs'
 
-test('getRunPackageManagerInstall', async ({ same }) => {
-  same(
+test('getRunPackageManagerInstall', () => {
+  assert.deepStrictEqual(
     getRunPackageManagerInstall('npm'),
     {
       type: 'list',
@@ -16,8 +17,8 @@ test('getRunPackageManagerInstall', async ({ same }) => {
   )
 })
 
-test('getUseTypescript', async ({ same }) => {
-  same(
+test('getUseTypescript', () => {
+  assert.deepStrictEqual(
     getUseTypescript(true),
     {
       type: 'list',
@@ -30,8 +31,8 @@ test('getUseTypescript', async ({ same }) => {
   )
 })
 
-test('getPort', async ({ same }) => {
-  same(
+test('getPort', () => {
+  assert.deepStrictEqual(
     getPort(undefined),
     {
       type: 'input',
@@ -41,7 +42,7 @@ test('getPort', async ({ same }) => {
     }
   )
 
-  same(
+  assert.deepStrictEqual(
     getPort(undefined),
     {
       type: 'input',
@@ -51,7 +52,7 @@ test('getPort', async ({ same }) => {
     }
   )
 
-  same(
+  assert.deepStrictEqual(
     getPort(1234),
     {
       type: 'input',
@@ -61,7 +62,7 @@ test('getPort', async ({ same }) => {
     }
   )
 
-  same(
+  assert.deepStrictEqual(
     getPort(undefined),
     {
       type: 'input',

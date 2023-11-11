@@ -1,9 +1,10 @@
-import { test, beforeEach, afterEach } from 'tap'
+import { before, after, test } from 'node:test'
 import { tmpdir } from 'os'
 import { isFileAccessible } from '../src/utils.mjs'
 import { createPackageJson } from '../src/create-package-json.mjs'
 import { join } from 'path'
 import { mkdtemp, readFile, rm } from 'fs/promises'
+import assert from 'node:assert'
 
 let log = ''
 const fakeLogger = {
@@ -11,16 +12,16 @@ const fakeLogger = {
 }
 
 let tmpDir
-beforeEach(async () => {
+before(async () => {
   log = ''
   tmpDir = await mkdtemp(join(tmpdir(), 'test-create-platformatic-'))
 })
 
-afterEach(async () => {
+after(async () => {
   await rm(tmpDir, { recursive: true, force: true })
 })
 
-test('creates package.json file for db project', async ({ equal }) => {
+test('creates package.json file for db project', async () => {
   const version = '1.2.3'
   const fastifyVersion = '4.5.6'
   const addTSBuild = false
@@ -28,19 +29,27 @@ test('creates package.json file for db project', async ({ equal }) => {
   const dependencies = {
     '@platformatic/db': `^${version}`
   }
-  await createPackageJson(version, fastifyVersion, fakeLogger, tmpDir, addTSBuild, scripts, dependencies)
-  equal(log, `${join(tmpDir, 'package.json')} successfully created.`)
+  await createPackageJson(
+    version,
+    fastifyVersion,
+    fakeLogger,
+    tmpDir,
+    addTSBuild,
+    scripts,
+    dependencies
+  )
+  assert.strictEqual(log, `${join(tmpDir, 'package.json')} successfully created.`)
   const accessible = await isFileAccessible(join(tmpDir, 'package.json'))
-  equal(accessible, true)
+  assert.strictEqual(accessible, true)
   const packageJson = JSON.parse(await readFile(join(tmpDir, 'package.json'), 'utf8'))
-  equal(packageJson.scripts.start, 'platformatic start')
-  equal(packageJson.scripts.build, undefined)
-  equal(packageJson.dependencies.platformatic, `^${version}`)
-  equal(packageJson.dependencies['@platformatic/db'], `^${version}`)
-  equal(packageJson.devDependencies.fastify, `^${fastifyVersion}`)
+  assert.strictEqual(packageJson.scripts.start, 'platformatic start')
+  assert.strictEqual(packageJson.scripts.build, undefined)
+  assert.strictEqual(packageJson.dependencies.platformatic, `^${version}`)
+  assert.strictEqual(packageJson.dependencies['@platformatic/db'], `^${version}`)
+  assert.strictEqual(packageJson.devDependencies.fastify, `^${fastifyVersion}`)
 })
 
-test('creates package.json file for service project', async ({ equal }) => {
+test('creates package.json file for service project', async () => {
   const version = '1.2.3'
   const fastifyVersion = '4.5.6'
   const addTSBuild = false
@@ -48,28 +57,28 @@ test('creates package.json file for service project', async ({ equal }) => {
     typescript: '^5.2.2'
   }
   await createPackageJson(version, fastifyVersion, fakeLogger, tmpDir, addTSBuild, {}, {}, devDependencies)
-  equal(log, `${join(tmpDir, 'package.json')} successfully created.`)
+  assert.strictEqual(log, `${join(tmpDir, 'package.json')} successfully created.`)
   const accessible = await isFileAccessible(join(tmpDir, 'package.json'))
-  equal(accessible, true)
+  assert.strictEqual(accessible, true)
   const packageJson = JSON.parse(await readFile(join(tmpDir, 'package.json'), 'utf8'))
-  equal(packageJson.scripts.start, 'platformatic start')
-  equal(packageJson.dependencies.platformatic, `^${version}`)
-  equal(packageJson.devDependencies.fastify, `^${fastifyVersion}`)
-  equal(packageJson.devDependencies.typescript, '^5.2.2')
+  assert.strictEqual(packageJson.scripts.start, 'platformatic start')
+  assert.strictEqual(packageJson.dependencies.platformatic, `^${version}`)
+  assert.strictEqual(packageJson.devDependencies.fastify, `^${fastifyVersion}`)
+  assert.strictEqual(packageJson.devDependencies.typescript, '^5.2.2')
 })
 
-test('creates package.json file with TS build', async ({ equal }) => {
+test('creates package.json file with TS build', async () => {
   const version = '1.2.3'
   const fastifyVersion = '4.5.6'
   const addTSBuild = true
   await createPackageJson(version, fastifyVersion, fakeLogger, tmpDir, addTSBuild)
-  equal(log, `${join(tmpDir, 'package.json')} successfully created.`)
+  assert.strictEqual(log, `${join(tmpDir, 'package.json')} successfully created.`)
   const accessible = await isFileAccessible(join(tmpDir, 'package.json'))
-  equal(accessible, true)
+  assert.strictEqual(accessible, true)
   const packageJson = JSON.parse(await readFile(join(tmpDir, 'package.json'), 'utf8'))
-  equal(packageJson.scripts.start, 'platformatic start')
-  equal(packageJson.scripts.clean, 'rm -fr ./dist')
-  equal(packageJson.scripts.build, 'platformatic compile')
-  equal(packageJson.dependencies.platformatic, `^${version}`)
-  equal(packageJson.devDependencies.fastify, `^${fastifyVersion}`)
+  assert.strictEqual(packageJson.scripts.start, 'platformatic start')
+  assert.strictEqual(packageJson.scripts.clean, 'rm -fr ./dist')
+  assert.strictEqual(packageJson.scripts.build, 'platformatic compile')
+  assert.strictEqual(packageJson.dependencies.platformatic, `^${version}`)
+  assert.strictEqual(packageJson.devDependencies.fastify, `^${fastifyVersion}`)
 })

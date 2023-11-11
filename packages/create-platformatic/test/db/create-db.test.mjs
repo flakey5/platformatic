@@ -1,5 +1,6 @@
 import createDB from '../../src/db/create-db.mjs'
-import { test, beforeEach, afterEach } from 'tap'
+import { test, before, after } from 'node:test'
+import assert from 'node:assert'
 import { isFileAccessible } from '../../src/utils.mjs'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -24,11 +25,11 @@ DROP TABLE movies;
 const base = tmpdir()
 let tmpDir
 let log = []
-beforeEach(async () => {
+before(async () => {
   tmpDir = await mkdtemp(join(base, 'test-create-platformatic-'))
 })
 
-afterEach(async () => {
+after(async () => {
   log = []
   await rm(tmpDir, { recursive: true, force: true })
   process.env = {}
@@ -39,7 +40,7 @@ const fakeLogger = {
   info: msg => log.push(msg)
 }
 
-test('creates project with no typescript', async ({ equal }) => {
+test('creates project with no typescript', async () => {
   const params = {
     hostname: 'myhost',
     port: 6666,
@@ -59,40 +60,40 @@ test('creates project with no typescript', async ({ equal }) => {
   const ajv = new Ajv({ strict: false })
   ajv.addKeyword('relativePath')
   const validate = ajv.compile(schema)
-  equal(validate(dbConfig), true)
+  assert.strictEqual(validate(dbConfig), true)
 
-  equal(server.hostname, '{PLT_SERVER_HOSTNAME}')
-  equal(server.port, '{PORT}')
-  equal(db.connectionString, '{DATABASE_URL}')
-  equal(db.schemalock, true)
+  assert.strictEqual(server.hostname, '{PLT_SERVER_HOSTNAME}')
+  assert.strictEqual(server.port, '{PORT}')
+  assert.strictEqual(db.connectionString, '{DATABASE_URL}')
+  assert.strictEqual(db.schemalock, true)
 
   const pathToDbEnvFile = join(tmpDir, '.env')
   dotenv.config({ path: pathToDbEnvFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
-  equal(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
   process.env = {}
 
   const pathToDbEnvSampleFile = join(tmpDir, '.env.sample')
   dotenv.config({ path: pathToDbEnvSampleFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
-  equal(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
 
-  equal(db.graphql, true)
-  equal(db.openapi, true)
-  equal(migrations.dir, 'migrations')
+  assert.strictEqual(db.graphql, true)
+  assert.strictEqual(db.openapi, true)
+  assert.strictEqual(migrations.dir, 'migrations')
 
   const migrationFileDo = await readFile(pathToMigrationFileDo, 'utf8')
-  equal(migrationFileDo, moviesMigrationDo)
+  assert.strictEqual(migrationFileDo, moviesMigrationDo)
   const migrationFileUndo = await readFile(pathToMigrationFileUndo, 'utf8')
-  equal(migrationFileUndo, moviesMigrationUndo)
+  assert.strictEqual(migrationFileUndo, moviesMigrationUndo)
 
-  equal(await isFileAccessible(join(tmpDir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(tmpDir, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'plugins', 'example.js')), true)
 })
 
-test('creates project with no typescript and no plugin', async ({ equal }) => {
+test('creates project with no typescript and no plugin', async () => {
   const params = {
     hostname: 'myhost',
     port: 6666,
@@ -111,36 +112,36 @@ test('creates project with no typescript and no plugin', async ({ equal }) => {
   const dbConfig = JSON.parse(dbConfigFile)
   const { server, db, migrations } = dbConfig
 
-  equal(server.hostname, '{PLT_SERVER_HOSTNAME}')
-  equal(server.port, '{PORT}')
-  equal(db.connectionString, '{DATABASE_URL}')
+  assert.strictEqual(server.hostname, '{PLT_SERVER_HOSTNAME}')
+  assert.strictEqual(server.port, '{PORT}')
+  assert.strictEqual(db.connectionString, '{DATABASE_URL}')
 
   const pathToDbEnvFile = join(tmpDir, '.env')
   dotenv.config({ path: pathToDbEnvFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
-  equal(process.env.DATABASE_URL, 'sqlite://./custom/path/to/db.sqlite')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./custom/path/to/db.sqlite')
   process.env = {}
 
   const pathToDbEnvSampleFile = join(tmpDir, '.env.sample')
   dotenv.config({ path: pathToDbEnvSampleFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
-  equal(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
 
-  equal(db.graphql, true)
-  equal(db.openapi, true)
-  equal(migrations.dir, 'migrations')
+  assert.strictEqual(db.graphql, true)
+  assert.strictEqual(db.openapi, true)
+  assert.strictEqual(migrations.dir, 'migrations')
 
   const migrationFileDo = await readFile(pathToMigrationFileDo, 'utf8')
-  equal(migrationFileDo, moviesMigrationDo)
+  assert.strictEqual(migrationFileDo, moviesMigrationDo)
   const migrationFileUndo = await readFile(pathToMigrationFileUndo, 'utf8')
-  equal(migrationFileUndo, moviesMigrationUndo)
+  assert.strictEqual(migrationFileUndo, moviesMigrationUndo)
 
-  equal(await isFileAccessible(join(tmpDir, 'plugin.js')), false)
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'plugin.js')), false)
 })
 
-test('creates project with no migrations', async ({ equal }) => {
+test('creates project with no migrations', async () => {
   const params = {
     hostname: 'myhost',
     port: 6666,
@@ -154,10 +155,10 @@ test('creates project with no migrations', async ({ equal }) => {
   const dbConfig = JSON.parse(dbConfigFile)
   const { migrations } = dbConfig
 
-  equal(migrations, undefined)
+  assert.strictEqual(migrations, undefined)
 })
 
-test('creates project with typescript', async ({ equal, same }) => {
+test('creates project with typescript', async () => {
   const params = {
     hostname: 'myhost',
     port: 6666,
@@ -175,47 +176,47 @@ test('creates project with typescript', async ({ equal, same }) => {
   const dbConfig = JSON.parse(dbConfigFile)
   const { server, db, migrations, plugins } = dbConfig
 
-  equal(server.hostname, '{PLT_SERVER_HOSTNAME}')
-  equal(server.port, '{PORT}')
-  equal(db.connectionString, '{DATABASE_URL}')
+  assert.strictEqual(server.hostname, '{PLT_SERVER_HOSTNAME}')
+  assert.strictEqual(server.port, '{PORT}')
+  assert.strictEqual(db.connectionString, '{DATABASE_URL}')
 
   const pathToDbEnvFile = join(tmpDir, '.env')
   dotenv.config({ path: pathToDbEnvFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
-  equal(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
-  equal(process.env.PLT_TYPESCRIPT, 'true')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
+  assert.strictEqual(process.env.PLT_TYPESCRIPT, 'true')
   process.env = {}
 
   const pathToDbEnvSampleFile = join(tmpDir, '.env.sample')
   dotenv.config({ path: pathToDbEnvSampleFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
-  equal(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
-  equal(process.env.PLT_TYPESCRIPT, 'true')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
+  assert.strictEqual(process.env.PLT_TYPESCRIPT, 'true')
 
-  equal(db.graphql, true)
-  equal(db.openapi, true)
-  equal(migrations.dir, 'migrations')
+  assert.strictEqual(db.graphql, true)
+  assert.strictEqual(db.openapi, true)
+  assert.strictEqual(migrations.dir, 'migrations')
 
   const migrationFileDo = await readFile(pathToMigrationFileDo, 'utf8')
-  equal(migrationFileDo, moviesMigrationDo)
+  assert.strictEqual(migrationFileDo, moviesMigrationDo)
   const migrationFileUndo = await readFile(pathToMigrationFileUndo, 'utf8')
-  equal(migrationFileUndo, moviesMigrationUndo)
+  assert.strictEqual(migrationFileUndo, moviesMigrationUndo)
 
-  same(plugins.paths, [{
+  assert.deepStrictEqual(plugins.paths, [{
     path: './plugins',
     encapsulate: false
   }, {
     path: './routes'
   }])
-  equal(plugins.typescript, '{PLT_TYPESCRIPT}')
-  equal(await isFileAccessible(join(tmpDir, 'plugins', 'example.ts')), true)
-  equal(await isFileAccessible(join(tmpDir, 'routes', 'root.ts')), true)
-  equal(await isFileAccessible(join(tmpDir, 'tsconfig.json')), true)
+  assert.strictEqual(plugins.typescript, '{PLT_TYPESCRIPT}')
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'plugins', 'example.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'routes', 'root.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'tsconfig.json')), true)
 })
 
-test('creates project with no default migrations', async ({ notOk }) => {
+test('creates project with no default migrations', async () => {
   const params = {
     hostname: 'myhost',
     port: 6666,
@@ -223,12 +224,12 @@ test('creates project with no default migrations', async ({ notOk }) => {
     migrations: ''
   }
   await createDB(params, fakeLogger, tmpDir)
-  notOk(log.includes('Migrations folder migrations successfully created.'))
-  notOk(log.includes('Migration file 001.do.sql successfully created.'))
-  notOk(log.includes('Migration file 001.undo.sql successfully created.'))
+  assert.ok(!log.includes('Migrations folder migrations successfully created.'))
+  assert.ok(!log.includes('Migration file 001.do.sql successfully created.'))
+  assert.ok(!log.includes('Migration file 001.undo.sql successfully created.'))
 })
 
-test('creates project with default migrations', async ({ ok }) => {
+test('creates project with default migrations', async () => {
   const params = {
     hostname: 'myhost',
     port: 6666,
@@ -236,12 +237,12 @@ test('creates project with default migrations', async ({ ok }) => {
     migrations: 'migrations'
   }
   await createDB(params, fakeLogger, tmpDir)
-  ok(log.includes('Migrations folder migrations successfully created.'))
-  ok(log.includes('Migration file 001.do.sql successfully created.'))
-  ok(log.includes('Migration file 001.undo.sql successfully created.'))
+  assert.ok(log.includes('Migrations folder migrations successfully created.'))
+  assert.ok(log.includes('Migration file 001.do.sql successfully created.'))
+  assert.ok(log.includes('Migration file 001.undo.sql successfully created.'))
 })
 
-test('creates project in a runtime context', async ({ equal }) => {
+test('creates project in a runtime context', async () => {
   const params = {
     isRuntimeContext: true,
     hostname: 'myhost',
@@ -262,34 +263,34 @@ test('creates project in a runtime context', async ({ equal }) => {
   const ajv = new Ajv({ strict: false })
   ajv.addKeyword('relativePath')
   const validate = ajv.compile(schema)
-  equal(validate(dbConfig), true)
+  assert.strictEqual(validate(dbConfig), true)
 
-  equal(server, undefined)
-  equal(db.connectionString, '{DATABASE_URL}')
-  equal(db.schemalock, true)
+  assert.strictEqual(server, undefined)
+  assert.strictEqual(db.connectionString, '{DATABASE_URL}')
+  assert.strictEqual(db.schemalock, true)
 
   const pathToDbEnvFile = join(tmpDir, '.env')
   dotenv.config({ path: pathToDbEnvFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, undefined)
-  equal(process.env.PORT, undefined)
-  equal(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, undefined)
+  assert.strictEqual(process.env.PORT, undefined)
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
   process.env = {}
 
   const pathToDbEnvSampleFile = join(tmpDir, '.env.sample')
   dotenv.config({ path: pathToDbEnvSampleFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, undefined)
-  equal(process.env.PORT, undefined)
-  equal(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, undefined)
+  assert.strictEqual(process.env.PORT, undefined)
+  assert.strictEqual(process.env.DATABASE_URL, 'sqlite://./db.sqlite')
 
-  equal(db.graphql, true)
-  equal(db.openapi, true)
-  equal(migrations.dir, 'migrations')
+  assert.strictEqual(db.graphql, true)
+  assert.strictEqual(db.openapi, true)
+  assert.strictEqual(migrations.dir, 'migrations')
 
   const migrationFileDo = await readFile(pathToMigrationFileDo, 'utf8')
-  equal(migrationFileDo, moviesMigrationDo)
+  assert.strictEqual(migrationFileDo, moviesMigrationDo)
   const migrationFileUndo = await readFile(pathToMigrationFileUndo, 'utf8')
-  equal(migrationFileUndo, moviesMigrationUndo)
+  assert.strictEqual(migrationFileUndo, moviesMigrationUndo)
 
-  equal(await isFileAccessible(join(tmpDir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(tmpDir, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(tmpDir, 'plugins', 'example.js')), true)
 })

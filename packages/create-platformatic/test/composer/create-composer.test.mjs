@@ -1,5 +1,6 @@
 import createComposer from '../../src/composer/create-composer.mjs'
-import { test, beforeEach, afterEach } from 'tap'
+import { test, before, after } from 'node:test'
+import assert from 'node:assert'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import dotenv from 'dotenv'
@@ -8,11 +9,11 @@ import { mkdtemp, readFile, rm, stat } from 'fs/promises'
 const base = tmpdir()
 let tmpDir
 let log = []
-beforeEach(async () => {
+before(async () => {
   tmpDir = await mkdtemp(join(base, 'test-create-platformatic-'))
 })
 
-afterEach(async () => {
+after(async () => {
   log = []
   await rm(tmpDir, { recursive: true, force: true })
   process.env = {}
@@ -23,7 +24,7 @@ const fakeLogger = {
   info: msg => log.push(msg)
 }
 
-test('creates composer', async ({ equal, same, ok }) => {
+test('creates composer', async () => {
   const params = {
     hostname: 'myhost',
     port: 6666,
@@ -37,21 +38,21 @@ test('creates composer', async ({ equal, same, ok }) => {
   const composerConfig = JSON.parse(composerConfigFile)
   const { server, composer } = composerConfig
 
-  equal(server.hostname, '{PLT_SERVER_HOSTNAME}')
-  equal(server.port, '{PORT}')
+  assert.strictEqual(server.hostname, '{PLT_SERVER_HOSTNAME}')
+  assert.strictEqual(server.port, '{PORT}')
 
   const pathToDbEnvFile = join(tmpDir, '.env')
   dotenv.config({ path: pathToDbEnvFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
   process.env = {}
 
   const pathToDbEnvSampleFile = join(tmpDir, '.env.sample')
   dotenv.config({ path: pathToDbEnvSampleFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, 'myhost')
-  equal(process.env.PORT, '6666')
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, 'myhost')
+  assert.strictEqual(process.env.PORT, '6666')
 
-  same(composer, {
+  assert.deepStrictEqual(composer, {
     services: [{
       id: 'example',
       origin: '{PLT_EXAMPLE_ORIGIN}',
@@ -63,7 +64,7 @@ test('creates composer', async ({ equal, same, ok }) => {
   })
 
   // plugins and routes config is there
-  same(composerConfig.plugins, {
+  assert.deepStrictEqual(composerConfig.plugins, {
     paths: [
       { path: './plugins', encapsulate: false },
       './routes'
@@ -73,11 +74,11 @@ test('creates composer', async ({ equal, same, ok }) => {
   const directoriesToCheck = ['plugins', 'routes']
   for (const d of directoriesToCheck) {
     const meta = await stat(join(tmpDir, d))
-    equal(meta.isDirectory(), true)
+    assert.deepStrictEqual(meta.isDirectory(), true)
   }
 })
 
-test('creates composer in a runtime context', async ({ equal, same, ok }) => {
+test('creates composer in a runtime context', async () => {
   const params = {
     isRuntimeContext: true,
     servicesToCompose: ['service1', 'service2'],
@@ -93,20 +94,20 @@ test('creates composer in a runtime context', async ({ equal, same, ok }) => {
   const composerConfig = JSON.parse(composerConfigFile)
   const { server, composer } = composerConfig
 
-  equal(server, undefined)
+  assert.strictEqual(server, undefined)
 
   const pathToEnvFile = join(tmpDir, '.env')
   dotenv.config({ path: pathToEnvFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, undefined)
-  equal(process.env.PORT, undefined)
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, undefined)
+  assert.strictEqual(process.env.PORT, undefined)
   process.env = {}
 
   const pathToEnvSampleFile = join(tmpDir, '.env.sample')
   dotenv.config({ path: pathToEnvSampleFile })
-  equal(process.env.PLT_SERVER_HOSTNAME, undefined)
-  equal(process.env.PORT, undefined)
+  assert.strictEqual(process.env.PLT_SERVER_HOSTNAME, undefined)
+  assert.strictEqual(process.env.PORT, undefined)
 
-  same(composer, {
+  assert.equal(composer, {
     services: [
       {
         id: 'service1',

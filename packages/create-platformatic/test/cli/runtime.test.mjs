@@ -1,4 +1,5 @@
-import { test, beforeEach, afterEach } from 'tap'
+import { test, before, after } from 'node:test'
+import assert from 'node:assert'
 import { executeCreatePlatformatic, keys, walk, getServices } from './helper.mjs'
 import { isFileAccessible } from '../../src/utils.mjs'
 import { join } from 'node:path'
@@ -6,11 +7,11 @@ import { tmpdir } from 'os'
 import { mkdtemp, rm } from 'fs/promises'
 
 let tmpDir
-beforeEach(async () => {
+before(async () => {
   tmpDir = await mkdtemp(join(tmpdir(), 'test-create-platformatic-'))
 })
 
-afterEach(async () => {
+after(async () => {
   try {
     await rm(tmpDir, { recursive: true, force: true })
   } catch (e) {
@@ -18,7 +19,7 @@ afterEach(async () => {
   }
 })
 
-test('Creates a Platformatic Runtime with one Service', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic Runtime with one Service', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -65,29 +66,29 @@ test('Creates a Platformatic Runtime with one Service', async ({ equal, same, ma
   const baseProjectDir = join(tmpDir, 'platformatic-runtime')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.runtime.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), false)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), false)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.runtime.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
 
   // Here check the generated service
   const services = await getServices(join(baseProjectDir, 'services'))
-  equal(services.length, 1)
+  assert.strictEqual(services.length, 1)
   const baseServiceDir = join(baseProjectDir, 'services', services[0])
-  equal(await isFileAccessible(join(baseServiceDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseServiceDir, 'platformatic.service.json')), true)
-  equal(await isFileAccessible(join(baseServiceDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseServiceDir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(baseServiceDir, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseServiceDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseServiceDir, 'platformatic.service.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseServiceDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseServiceDir, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseServiceDir, 'plugins', 'example.js')), true)
   // TODO: re-enable when we fix this https://github.com/platformatic/platformatic/issues/1657
   // equal(await isFileAccessible(join(baseServiceDir, 'global.d.ts')), true)
 })
 
-test('Creates a Platformatic Runtime with two Services', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic Runtime with two Services', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -152,33 +153,33 @@ test('Creates a Platformatic Runtime with two Services', async ({ equal, same, m
   const baseProjectDir = join(tmpDir, 'platformatic-runtime')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.runtime.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), false)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), false)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.runtime.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
 
   // Here check the generated services
   const services = await getServices(join(baseProjectDir, 'services'))
-  equal(services.length, 2)
+  assert.strictEqual(services.length, 2)
   const baseService0Dir = join(baseProjectDir, 'services', services[0])
-  equal(await isFileAccessible(join(baseService0Dir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseService0Dir, 'platformatic.service.json')), true)
-  equal(await isFileAccessible(join(baseService0Dir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseService0Dir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(baseService0Dir, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService0Dir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService0Dir, 'platformatic.service.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService0Dir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService0Dir, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService0Dir, 'plugins', 'example.js')), true)
   // TODO: re-enable when we fix this https://github.com/platformatic/platformatic/issues/1657
   // equal(await isFileAccessible(join(baseService0Dir, 'global.d.ts')), true)
 
   const baseService1Dir = join(baseProjectDir, 'services', services[1])
-  equal(await isFileAccessible(join(baseService1Dir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseService1Dir, 'platformatic.service.json')), true)
-  equal(await isFileAccessible(join(baseService1Dir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseService1Dir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(baseService1Dir, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService1Dir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService1Dir, 'platformatic.service.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService1Dir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService1Dir, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseService1Dir, 'plugins', 'example.js')), true)
   // TODO: re-enable when we fix this https://github.com/platformatic/platformatic/issues/1657
   // equal(await isFileAccessible(join(baseService1Dir, 'global.d.ts')), true)
 })

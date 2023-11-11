@@ -1,36 +1,37 @@
-import { test, beforeEach } from 'tap'
+import { before, test } from 'node:test'
+import assert from 'node:assert'
 import { getPkgManager } from '../src/get-pkg-manager.mjs'
 
-beforeEach(() => {
+before(() => {
   delete process.env.npm_config_user_agent
 })
 
-test('detects npm', async ({ end, equal }) => {
+test('detects npm', () => {
   process.env.npm_config_user_agent = 'npm/7.18.1 node/v16.4.2 darwin x64'
-  equal(getPkgManager(), 'npm')
+  assert.strictEqual(getPkgManager(), 'npm')
 })
 
-test('detects yarn', async ({ end, equal }) => {
+test('detects yarn', () => {
   process.env.npm_config_user_agent = 'yarn/1.22.10 npm/? node/v16.4.2 darwin x64'
-  equal(getPkgManager(), 'yarn')
+  assert.strictEqual(getPkgManager(), 'yarn')
 })
 
-test('detects pnpm', async ({ end, equal }) => {
+test('detects pnpm', () => {
   process.env.npm_config_user_agent = 'pnpm/6.14.1 npm/? node/v16.4.2 darwin x64'
-  equal(getPkgManager(), 'pnpm')
+  assert.strictEqual(getPkgManager(), 'pnpm')
 })
 
-test('detects cnpm', async ({ end, equal }) => {
+test('detects cnpm', () => {
   process.env.npm_config_user_agent = 'cnpm/7.0.0 npminsall/1.0.0 node/v16.4.2 darwin x64'
-  equal(getPkgManager(), 'cnpm')
+  assert.strictEqual(getPkgManager(), 'cnpm')
 })
 
-test('defaults to npm if the user agent is unknown', async ({ end, equal }) => {
+test('defaults to npm if the user agent is unknown', () => {
   process.env.npm_config_user_agent = 'xxxxxxxxxxxxxxxxxx'
-  equal(getPkgManager(), 'npm')
+  assert.strictEqual(getPkgManager(), 'npm')
 })
 
-test('defaults to npm if the user agent is not set', async ({ end, equal }) => {
+test('defaults to npm if the user agent is not set', () => {
   delete process.env.npm_config_user_agent
-  equal(getPkgManager(), 'npm')
+  assert.strictEqual(getPkgManager(), 'npm')
 })

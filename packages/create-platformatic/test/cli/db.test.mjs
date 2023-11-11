@@ -1,4 +1,5 @@
-import { test, beforeEach, afterEach } from 'tap'
+import { test, before, after } from 'node:test'
+import assert from 'node:assert'
 import { executeCreatePlatformatic, keys, walk } from './helper.mjs'
 import { isFileAccessible } from '../../src/utils.mjs'
 import { join } from 'node:path'
@@ -6,11 +7,11 @@ import { tmpdir } from 'os'
 import { mkdtemp, rm } from 'fs/promises'
 
 let tmpDir
-beforeEach(async () => {
+before(async () => {
   tmpDir = await mkdtemp(join(tmpdir(), 'test-create-platformatic-'))
 })
 
-afterEach(async () => {
+after(async () => {
   try {
     await rm(tmpDir, { recursive: true, force: true })
   } catch (e) {
@@ -18,7 +19,7 @@ afterEach(async () => {
   }
 })
 
-test('Creates a Platformatic DB service with no migrations and no plugin', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic DB service with no migrations and no plugin', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -67,15 +68,15 @@ test('Creates a Platformatic DB service with no migrations and no plugin', async
   const baseProjectDir = join(tmpDir, 'platformatic-db')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.db.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.db.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
 })
 
-test('Creates a Platformatic DB service with migrations and plugin', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic DB service with migrations and plugin', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -127,21 +128,21 @@ test('Creates a Platformatic DB service with migrations and plugin', async ({ eq
   const baseProjectDir = join(tmpDir, 'platformatic-db')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.db.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'migrations')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'migrations', '001.do.sql')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'migrations', '001.undo.sql')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.js')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'types', 'index.d.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.db.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'migrations')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'migrations', '001.do.sql')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'migrations', '001.undo.sql')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'types', 'index.d.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
 })
 
-test('Creates a Platformatic DB service with plugin using typescript, creating all the github actions', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic DB service with plugin using typescript, creating all the github actions', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -193,19 +194,19 @@ test('Creates a Platformatic DB service with plugin using typescript, creating a
   const baseProjectDir = join(tmpDir, 'platformatic-db')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.db.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'migrations')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'migrations', '001.do.sql')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'migrations', '001.undo.sql')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'types', 'index.d.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'global.d.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'tsconfig.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.db.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'migrations')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'migrations', '001.do.sql')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'migrations', '001.undo.sql')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'types', 'index.d.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'global.d.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'tsconfig.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), true)
 })

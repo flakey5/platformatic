@@ -1,4 +1,5 @@
-import { test, beforeEach, afterEach } from 'tap'
+import { test, before, after } from 'node:test'
+import assert from 'node:assert'
 import { executeCreatePlatformatic, keys, walk } from './helper.mjs'
 import { isFileAccessible } from '../../src/utils.mjs'
 import { join } from 'node:path'
@@ -6,11 +7,11 @@ import { tmpdir } from 'os'
 import { mkdtemp, rm } from 'fs/promises'
 
 let tmpDir
-beforeEach(async () => {
+before(async () => {
   tmpDir = await mkdtemp(join(tmpdir(), 'test-create-platformatic-'))
 })
 
-afterEach(async () => {
+after(async () => {
   try {
     await rm(tmpDir, { recursive: true, force: true })
   } catch (e) {
@@ -18,7 +19,7 @@ afterEach(async () => {
   }
 })
 
-test('Creates a Platformatic Composer', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic Composer', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -53,20 +54,20 @@ test('Creates a Platformatic Composer', async ({ equal, same, match, teardown })
   const baseProjectDir = join(tmpDir, 'platformatic-composer')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.composer.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.js')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), false)
-  equal(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.js')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), false)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), false)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.composer.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'routes', 'root.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.js')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), false)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.git', 'config')), false)
 })
 
-test('Creates a Platformatic Composer with typescript support adn GitHub Actions', async ({ equal, same, match, teardown }) => {
+test('Creates a Platformatic Composer with typescript support adn GitHub Actions', async () => {
   // The actions must match IN ORDER
   const actions = [{
     match: 'Which kind of project do you want to create?',
@@ -99,15 +100,15 @@ test('Creates a Platformatic Composer with typescript support adn GitHub Actions
   const baseProjectDir = join(tmpDir, 'platformatic-composer')
   const files = await walk(baseProjectDir)
   console.log('==> created files', files)
-  equal(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'platformatic.composer.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'tsconfig.json')), true)
-  equal(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.ts')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), true)
-  equal(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.gitignore')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.env.sample')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'platformatic.composer.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'README.md')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'routes', 'root.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'tsconfig.json')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, 'plugins', 'example.ts')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-dynamic-workspace-deploy.yml')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.github', 'workflows', 'platformatic-static-workspace-deploy.yml')), true)
+  assert.strictEqual(await isFileAccessible(join(baseProjectDir, '.git', 'config')), true)
 })
